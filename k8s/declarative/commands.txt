@@ -1,0 +1,22 @@
+# MongoDB
+kubectl create deployment mongodb \
+  --image=mongo:7.0
+
+kubectl expose deployment mongodb \
+  --port=27017 \
+  --name=mongodb
+
+kubectl set env deployment/mongodb \
+  MONGO_INITDB_ROOT_USERNAME=admin \
+  MONGO_INITDB_ROOT_PASSWORD=adminpassword
+
+# App Python
+kubectl create deployment python-app \
+  --image=python-app:latest
+
+kubectl set env deployment/python-app \
+  MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/dbDevOps?authSource=admin \
+  DB_NAME=dbDevOps \
+  COLLECTION_NAME=studenti
+
+kubectl logs deployment/python-app
