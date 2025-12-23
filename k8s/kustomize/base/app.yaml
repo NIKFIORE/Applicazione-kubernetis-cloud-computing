@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+        - name: app
+          image: python-app:latest
+          env:
+            - name: MONGO_URI
+              value: mongodb://admin:adminpassword@mongodb:27017/dbDevOps?authSource=admin
+            - name: DB_NAME
+              value: dbDevOps
+            - name: COLLECTION_NAME
+              value: studenti
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: 256Mi
+            requests:
+              cpu: "0.1"
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-app
+spec:
+  selector:
+    app: python-app
+  ports:
+    - port: 80
+      targetPort: 80
