@@ -15,6 +15,7 @@ spec:
       containers:
         - name: app
           image: python-app:latest
+          imagePullPolicy: Never
           env:
             - name: MONGO_URI
               value: mongodb://admin:adminpassword@mongodb:27017/dbDevOps?authSource=admin
