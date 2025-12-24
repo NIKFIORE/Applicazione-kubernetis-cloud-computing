@@ -1,0 +1,9 @@
+db = db.getSiblingDB('dbDevOps');
+
+db.studenti.insertMany([
+  { matricola: "test", nome: "Mario", cognome: "Rossi", corso: "Ingegneria Informatica" },
+  { matricola: "12345", nome: "Luigi", cognome: "Verdi", corso: "Informatica" },
+  { matricola: "67890", nome: "Anna", cognome: "Bianchi", corso: "Ingegneria del Software" }
+]);
+
+print("Database inizializzato con successo!");

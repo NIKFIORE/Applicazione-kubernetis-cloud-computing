@@ -1,4 +1,5 @@
 resources:
   - pvc.yaml
+  - mongodb-init-configmap.yaml
   - mongodb.yaml
   - app.yaml
