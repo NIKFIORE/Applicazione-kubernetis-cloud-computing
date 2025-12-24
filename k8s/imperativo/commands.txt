@@ -1,6 +1,6 @@
-# MongoDB
-kubectl create deployment mongodb \
-  --image=mongo:7.0
+cd Applicazione-kubernetis-cloud-computing
+
+kubectl create deployment mongodb --image=mongo:7.0
 
 kubectl expose deployment mongodb \
   --port=27017 \
@@ -10,13 +10,35 @@ kubectl set env deployment/mongodb \
   MONGO_INITDB_ROOT_USERNAME=admin \
   MONGO_INITDB_ROOT_PASSWORD=adminpassword
 
-# App Python
-kubectl create deployment python-app \
-  --image=python-app:latest
+kubectl create deployment python-app --image=python-app:latest
 
 kubectl set env deployment/python-app \
   MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/dbDevOps?authSource=admin \
   DB_NAME=dbDevOps \
   COLLECTION_NAME=studenti
 
+kubectl patch deployment python-app -p \
+'{"spec":{"template":{"spec":{"containers":[{"name":"python-app","imagePullPolicy":"IfNotPresent"}]}}}}'
+
+kubectl rollout restart deployment python-app
+
+kubectl get pods
 kubectl logs deployment/python-app
+
+kubectl exec -it deployment/mongodb -- \
+  mongosh -u admin -p adminpassword --authenticationDatabase admin
+
+use dbDevOps
+
+db.studenti.insertOne({
+  matricola: "12345",
+  nome: "Luigi",
+  cognome: "Verdi",
+  corso: "Informatica"
+})
+
+kubectl rollout restart deployment python-app
+kubectl logs deployment/python-app
+
+kubectl delete deployment python-app mongodb
+kubectl delete service python-app mongodb
