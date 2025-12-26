@@ -133,10 +133,9 @@ Lo script crea il database `dbDevOps` con la collection `studenti`, popolata con
 La modalità imperativa utilizza comandi `kubectl` diretti per creare le risorse Kubernetes.
 
 ### Esecuzione
-
 ```bash
 # 1. Navigazione nella directory del progetto
-cd <nome-repository>
+cd Applicazione-kubernetis-cloud-computing
 
 # 2. Build immagine Docker
 docker build -t python-app:latest app/
@@ -157,35 +156,84 @@ kubectl set env deployment/mongodb \
   MONGO_INITDB_ROOT_USERNAME=admin \
   MONGO_INITDB_ROOT_PASSWORD=adminpassword
 
-# 7. Creazione deployment applicazione Python
+# 7. Attesa avvio MongoDB (30 secondi)
+sleep 30
+
+# 8. Inizializzazione database con dati di test
+kubectl exec deployment/mongodb -- \
+  mongosh -u admin -p adminpassword --authenticationDatabase admin \
+  --eval "use dbDevOps; db.studenti.insertMany([{matricola: 'test', nome: 'Mario', cognome: 'Rossi', corso: 'Ingegneria Informatica'}, {matricola: '12345', nome: 'Luigi', cognome: 'Verdi', corso: 'Informatica'}, {matricola: '67890', nome: 'Anna', cognome: 'Bianchi', corso: 'Ingegneria del Software'}])"
+
+# 9. Creazione deployment applicazione Python
 kubectl create deployment python-app --image=python-app:latest
 
-# 8. Configurazione variabili ambiente applicazione Python
+# 10. Configurazione variabili ambiente applicazione Python
 kubectl set env deployment/python-app \
   MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/dbDevOps?authSource=admin \
   DB_NAME=dbDevOps \
   COLLECTION_NAME=studenti
 
-# 9. Configurazione policy di pull dell'immagine
+# 11. Configurazione policy di pull dell'immagine
 kubectl patch deployment python-app -p \
 '{"spec":{"template":{"spec":{"containers":[{"name":"python-app","imagePullPolicy":"IfNotPresent"}]}}}}'
 
-# 10. Riavvio deployment per applicare modifiche
-kubectl rollout restart deployment python-app
+# 12. Attesa avvio applicazione (20 secondi)
+sleep 20
 ```
 
 ---
 
-### Inizializzazione Manuale del Database
-
-**⚠️ Nota:** In modalità imperativa il database **non è inizializzato automaticamente**. È necessario inserire i dati manualmente:
-
+### Verifica
 ```bash
-# 11. Accesso interattivo a MongoDB
+# Verifica stato dei pods
+kubectl get pods
+
+# Visualizza logs dell'applicazione
+kubectl logs deployment/python-app
+```
+
+**Output atteso:**
+```text
+Pinged your deployment. You successfully connected to MongoDB!
+Matricola: 12345 trovata!
+Nome: Luigi
+Cognome: Verdi
+Corso: Informatica
+Disconnected successfully!
+```
+
+---
+
+### Verifica Database (GET)
+```bash
+kubectl exec -it deployment/mongodb -- \
+  mongosh -u admin -p adminpassword \
+  --authenticationDatabase admin dbDevOps \
+  --eval "db.studenti.findOne({matricola: '12345'})"
+```
+
+**Output atteso:**
+```json
+{
+  _id: ObjectId('...'),
+  matricola: '12345',
+  nome: 'Luigi',
+  cognome: 'Verdi',
+  corso: 'Informatica'
+}
+```
+
+---
+
+### Inizializzazione Manuale del Database (Opzionale)
+
+Se preferisci inserire i dati manualmente in modalità interattiva:
+```bash
+# Accesso interattivo a MongoDB
 kubectl exec -it deployment/mongodb -- \
   mongosh -u admin -p adminpassword --authenticationDatabase admin
 
-# 12. All'interno di mongosh, esegui:
+# All'interno di mongosh, esegui:
 use dbDevOps
 
 db.studenti.insertMany([
@@ -211,52 +259,19 @@ db.studenti.insertMany([
 
 exit
 
-# 13. Riavvio applicazione dopo inizializzazione database
+# Riavvio applicazione dopo inizializzazione database
 kubectl rollout restart deployment python-app
 ```
 
 ---
 
-### Verifica
-
-```bash
-# Verifica stato dei pods
-kubectl get pods
-
-# Visualizza logs dell'applicazione
-kubectl logs deployment/python-app
-```
-
-**Output atteso:**
-
-```text
-Pinged your deployment. You successfully connected to MongoDB!
-Matricola: 12345 trovata!
-Nome: Luigi
-Cognome: Verdi
-Corso: Informatica
-Disconnected successfully!
-```
-
----
-
-### Verifica Database (GET)
-
-```bash
-kubectl exec -it deployment/mongodb -- \
-mongosh -u admin -p adminpassword \
---authenticationDatabase admin dbDevOps \
---eval "db.studenti.findOne({matricola: '12345'})"
-```
-
----
-
 ### Pulizia
-
 ```bash
 kubectl delete deployment python-app mongodb
 kubectl delete service mongodb
 ```
+
+---
 
 ---
 

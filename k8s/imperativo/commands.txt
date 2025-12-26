@@ -24,48 +24,36 @@ kubectl set env deployment/mongodb \
   MONGO_INITDB_ROOT_USERNAME=admin \
   MONGO_INITDB_ROOT_PASSWORD=adminpassword
 
-# 7. Creazione deployment applicazione Python
+# 7. Attesa avvio MongoDB (30 secondi)
+sleep 30
+
+# 8. Inizializzazione database con dati di test
+kubectl exec -it deployment/mongodb -- \
+  mongosh -u admin -p adminpassword --authenticationDatabase admin \
+  --eval "use dbDevOps; db.studenti.insertOne({matricola: '12345', nome: 'Luigi', cognome: 'Verdi', corso: 'Informatica'})"
+
+# 9. Creazione deployment applicazione Python
 kubectl create deployment python-app --image=python-app:latest
 
-# 8. Configurazione variabili ambiente applicazione Python
+# 10. Configurazione variabili ambiente applicazione Python
 kubectl set env deployment/python-app \
   MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/dbDevOps?authSource=admin \
   DB_NAME=dbDevOps \
   COLLECTION_NAME=studenti
 
-# 9. Configurazione policy di pull dell'immagine
+# 11. Configurazione policy di pull dell'immagine
 kubectl patch deployment python-app -p \
 '{"spec":{"template":{"spec":{"containers":[{"name":"python-app","imagePullPolicy":"IfNotPresent"}]}}}}'
 
-# 10. Riavvio deployment per applicare modifiche
-kubectl rollout restart deployment python-app
+# 12. Attesa avvio applicazione (20 secondi)
+sleep 20
 
-# 11. Verifica pods
+# 13. Verifica pods
 kubectl get pods
 
-# 12. Verifica logs applicazione
+# 14. Verifica logs applicazione
 kubectl logs deployment/python-app
 
-# 13. Accesso interattivo a MongoDB
-kubectl exec -it deployment/mongodb -- \
-  mongosh -u admin -p adminpassword --authenticationDatabase admin
-
-# 14. Comandi da eseguire dentro MongoDB (mongosh):
-# use dbDevOps
-# db.studenti.insertOne({
-#   matricola: "12345",
-#   nome: "Luigi",
-#   cognome: "Verdi",
-#   corso: "Informatica"
-# })
-# exit
-
-# 15. Riavvio applicazione dopo inizializzazione database
-kubectl rollout restart deployment python-app
-
-# 16. Verifica logs dopo inserimento dati
-kubectl logs deployment/python-app
-
-# 17. Pulizia risorse modalità imperativa
+# 15. Pulizia risorse modalità imperativa
 kubectl delete deployment python-app mongodb
 kubectl delete service mongodb
