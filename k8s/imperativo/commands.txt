@@ -1,44 +1,71 @@
+# ========================================
+# MODALITÀ IMPERATIVA
+# ========================================
+
+# 1. Navigazione nella directory del progetto
 cd Applicazione-kubernetis-cloud-computing
 
+# 2. Build immagine Docker
+docker build -t python-app:latest app/
+
+# 3. Caricamento immagine in Minikube
+minikube image load python-app:latest
+
+# 4. Creazione deployment MongoDB
 kubectl create deployment mongodb --image=mongo:7.0
 
+# 5. Esposizione servizio MongoDB
 kubectl expose deployment mongodb \
   --port=27017 \
   --name=mongodb
 
+# 6. Configurazione variabili ambiente MongoDB
 kubectl set env deployment/mongodb \
   MONGO_INITDB_ROOT_USERNAME=admin \
   MONGO_INITDB_ROOT_PASSWORD=adminpassword
 
+# 7. Creazione deployment applicazione Python
 kubectl create deployment python-app --image=python-app:latest
 
+# 8. Configurazione variabili ambiente applicazione Python
 kubectl set env deployment/python-app \
   MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/dbDevOps?authSource=admin \
   DB_NAME=dbDevOps \
   COLLECTION_NAME=studenti
 
+# 9. Configurazione policy di pull dell'immagine
 kubectl patch deployment python-app -p \
 '{"spec":{"template":{"spec":{"containers":[{"name":"python-app","imagePullPolicy":"IfNotPresent"}]}}}}'
 
+# 10. Riavvio deployment per applicare modifiche
 kubectl rollout restart deployment python-app
 
+# 11. Verifica pods
 kubectl get pods
+
+# 12. Verifica logs applicazione
 kubectl logs deployment/python-app
 
+# 13. Accesso interattivo a MongoDB
 kubectl exec -it deployment/mongodb -- \
   mongosh -u admin -p adminpassword --authenticationDatabase admin
 
-use dbDevOps
+# 14. Comandi da eseguire dentro MongoDB (mongosh):
+# use dbDevOps
+# db.studenti.insertOne({
+#   matricola: "12345",
+#   nome: "Luigi",
+#   cognome: "Verdi",
+#   corso: "Informatica"
+# })
+# exit
 
-db.studenti.insertOne({
-  matricola: "12345",
-  nome: "Luigi",
-  cognome: "Verdi",
-  corso: "Informatica"
-})
-
+# 15. Riavvio applicazione dopo inizializzazione database
 kubectl rollout restart deployment python-app
+
+# 16. Verifica logs dopo inserimento dati
 kubectl logs deployment/python-app
 
+# 17. Pulizia risorse modalità imperativa
 kubectl delete deployment python-app mongodb
-kubectl delete service python-app mongodb
+kubectl delete service mongodb
