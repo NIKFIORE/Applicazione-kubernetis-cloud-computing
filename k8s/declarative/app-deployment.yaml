@@ -12,6 +12,7 @@ spec:
       labels:
         app: python-app
     spec:
+      restartPolicy: Never  
       containers:
         - name: app
           image: python-app:latest
