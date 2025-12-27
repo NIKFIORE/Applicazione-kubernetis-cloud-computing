@@ -1,8 +1,8 @@
-apiVersion: kustomize.config.k8s.io/v1beta1  
-kind: Kustomization  
+apiVersion: kustomize.config.k8s.io/v1beta1   # API usata da Kustomize
+kind: Kustomization                          # Tipo di risorsa Kustomize
 
 resources:
-  - pvc.yaml
-  - mongodb-init-configmap.yaml
-  - mongodb.yaml
-  - app.yaml
+  - pvc.yaml                                 # PersistentVolumeClaim per MongoDB
+  - mongodb-init-configmap.yaml              # ConfigMap con script di inizializzazione MongoDB
+  - mongodb.yaml                             # Deployment e Service MongoDB
+  - app.yaml                                 # Deployment dell’applicazione Python

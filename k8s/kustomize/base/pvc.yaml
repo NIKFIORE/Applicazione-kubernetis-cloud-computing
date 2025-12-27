@@ -1,10 +1,10 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
+apiVersion: v1                          # API Kubernetes per risorse core
+kind: PersistentVolumeClaim             # Tipo di risorsa: PersistentVolumeClaim
 metadata:
-  name: mongodb-pvc
+  name: mongodb-pvc                     # Nome del PVC per MongoDB
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteOnce                     # Accesso in lettura/scrittura da un solo nodo
   resources:
     requests:
-      storage: 1Gi
+      storage: 1Gi                     # Spazio di storage richiesto

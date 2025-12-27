@@ -1,54 +1,54 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps/v1                     # API Kubernetes per i Deployment
+kind: Deployment                        # Tipo di risorsa: Deployment
 metadata:
-  name: mongodb
+  name: mongodb                         # Nome del Deployment MongoDB
 spec:
-  replicas: 1
+  replicas: 1                           # Numero di pod MongoDB
   selector:
     matchLabels:
-      app: mongodb
+      app: mongodb                     # Label usata dal selector
   template:
     metadata:
       labels:
-        app: mongodb
+        app: mongodb                   # Label del pod
     spec:
       containers:
-        - name: mongodb
-          image: mongo:7.0
+        - name: mongodb                # Nome del container
+          image: mongo:7.0             # Immagine ufficiale MongoDB
           ports:
-            - containerPort: 27017
+            - containerPort: 27017     # Porta interna del container MongoDB
           env:
-            - name: MONGO_INITDB_ROOT_USERNAME
+            - name: MONGO_INITDB_ROOT_USERNAME   # Username amministratore MongoDB
               value: admin
-            - name: MONGO_INITDB_ROOT_PASSWORD
+            - name: MONGO_INITDB_ROOT_PASSWORD   # Password amministratore MongoDB
               value: adminpassword
           resources:
             limits:
-              cpu: "0.5"
-              memory: 512Mi
+              cpu: "0.5"               # Limite massimo CPU
+              memory: 512Mi             # Limite massimo memoria
             requests:
-              cpu: "0.25"
-              memory: 256Mi
+              cpu: "0.25"              # CPU garantita
+              memory: 256Mi             # Memoria garantita
           volumeMounts:
-            - name: mongodb-storage
+            - name: mongodb-storage    # Volume per la persistenza dei dati
               mountPath: /data/db
-            - name: mongodb-init-script
+            - name: mongodb-init-script # Volume per script di inizializzazione
               mountPath: /docker-entrypoint-initdb.d
       volumes:
-        - name: mongodb-storage
+        - name: mongodb-storage        # PersistentVolumeClaim per MongoDB
           persistentVolumeClaim:
             claimName: mongodb-pvc
-        - name: mongodb-init-script
+        - name: mongodb-init-script    # ConfigMap con script di init MongoDB
           configMap:
             name: mongodb-init
 ---
-apiVersion: v1
-kind: Service
+apiVersion: v1                          # API Kubernetes per risorse core
+kind: Service                           # Tipo di risorsa: Service
 metadata:
-  name: mongodb
+  name: mongodb                         # Nome del Service MongoDB
 spec:
   selector:
-    app: mongodb
+    app: mongodb                        # Seleziona i pod MongoDB
   ports:
-    - port: 27017
-      targetPort: 27017
+    - port: 27017                       # Porta esposta dal Service
+      targetPort: 27017                 # Porta del container MongoDB

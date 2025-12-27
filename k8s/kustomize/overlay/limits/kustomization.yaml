@@ -1,35 +1,35 @@
-apiVersion: kustomize.config.k8s.io/v1beta1  
-kind: Kustomization  
+apiVersion: kustomize.config.k8s.io/v1beta1   # API usata da Kustomize
+kind: Kustomization                          # Tipo di risorsa Kustomize
 
 resources:
-  - ../../base
+  - ../../base                               # Risorse base da cui partire
 
 patchesStrategicMerge:
-  - |-
-    apiVersion: apps/v1
-    kind: Deployment
+  - |-                                    # Patch per il Deployment dell’app Python
+    apiVersion: apps/v1                    # API Kubernetes per Deployment
+    kind: Deployment                       # Tipo di risorsa
     metadata:
-      name: python-app
+      name: python-app                     # Deployment da patchare
     spec:
       template:
         spec:
           containers:
-            - name: app
+            - name: app                    # Container dell’app
               resources:
                 limits:
-                  cpu: "0.3"
-                  memory: 300Mi
-  - |-
-    apiVersion: apps/v1
-    kind: Deployment
+                  cpu: "0.3"               # Nuovo limite CPU per l’app
+                  memory: 300Mi            # Nuovo limite memoria per l’app
+  - |-                                    # Patch per il Deployment MongoDB
+    apiVersion: apps/v1                    # API Kubernetes per Deployment
+    kind: Deployment                       # Tipo di risorsa
     metadata:
-      name: mongodb
+      name: mongodb                        # Deployment MongoDB da patchare
     spec:
       template:
         spec:
           containers:
-            - name: mongodb
+            - name: mongodb                # Container MongoDB
               resources:
                 limits:
-                  cpu: "0.6"
-                  memory: 600Mi
+                  cpu: "0.6"               # Nuovo limite CPU per MongoDB
+                  memory: 600Mi             # Nuovo limite memoria per MongoDB
