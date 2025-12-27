@@ -1,33 +1,33 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps/v1                     # Versione API
+kind: Deployment                        # Tipo di risorsa
 metadata:
-  name: python-app
+  name: python-app                      # Nome del Deployment
 spec:
-  replicas: 1
+  replicas: 1                           # Numero di pod desiderati
   selector:
     matchLabels:
-      app: python-app
+      app: python-app                  # Label usata per associare i pod
   template:
     metadata:
       labels:
-        app: python-app
+        app: python-app                # Label del pod
     spec:
-      restartPolicy: Always  
+      restartPolicy: Always            # Politica di riavvio (default nei Deployment)
       containers:
-        - name: app
-          image: python-app:latest
-          imagePullPolicy: Never
+        - name: app                    # Nome del container
+          image: python-app:latest     # Immagine Docker dell’applicazione
+          imagePullPolicy: Never       # Usa l’immagine locale
           env:
-            - name: MONGO_URI
+            - name: MONGO_URI          # URI di connessione a MongoDB
               value: mongodb://admin:adminpassword@mongodb:27017/dbDevOps?authSource=admin
-            - name: DB_NAME
+            - name: DB_NAME            # Nome del database
               value: dbDevOps
-            - name: COLLECTION_NAME
+            - name: COLLECTION_NAME    # Nome della collection
               value: studenti
           resources:
             limits:
-              cpu: "0.25"
-              memory: 256Mi
+              cpu: "0.25"              # Limite massimo CPU
+              memory: 256Mi            # Limite massimo memoria
             requests:
-              cpu: "0.1"
-              memory: 128Mi
+              cpu: "0.1"               # CPU garantita
+              memory: 128Mi            # Memoria garantita

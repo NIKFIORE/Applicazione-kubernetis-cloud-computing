@@ -1,9 +1,9 @@
-apiVersion: v1
-kind: Service
+apiVersion: v1                          # Versione API
+kind: Service                           # Tipo di risorsa: Service
 metadata:
-  name: mongodb
+  name: mongodb                         # Nome del Service MongoDB
 spec:
   selector:
-    app: mongodb
+    app: mongodb                        # Seleziona i pod con label app=mongodb
   ports:
-    - port: 27017
+    - port: 27017                       # Porta esposta dal Service (cluster-internal)

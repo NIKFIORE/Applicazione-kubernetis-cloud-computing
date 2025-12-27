@@ -1,10 +1,10 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
+apiVersion: v1                          # Versione API
+kind: PersistentVolumeClaim             # Tipo di risorsa: PVC
 metadata:
-  name: mongodb-pvc
+  name: mongodb-pvc                     # Nome del PersistentVolumeClaim
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteOnce                     # Accesso in lettura/scrittura da un solo nodo
   resources:
     requests:
-      storage: 1Gi
+      storage: 1Gi                     # Spazio di storage richiesto
