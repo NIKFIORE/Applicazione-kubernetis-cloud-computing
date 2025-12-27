@@ -109,7 +109,13 @@ git clone <LINK_REPOSITORY>
 # Entra nella directory del progetto
 cd <nome-repository>
 ```
+### 3. Attivazione minikube
+Prima di eseguire le diverse modalità di deployment, è necessario avviare Minikube.
 
+```bash
+start minikube
+```
+Minikube è uno strumento che consente di eseguire un cluster Kubernetes locale su una singola macchina.
 ---
 
 ## Inizializzazione del Database
