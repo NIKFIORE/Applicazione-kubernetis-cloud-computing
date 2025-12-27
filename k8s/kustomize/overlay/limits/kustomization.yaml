@@ -6,30 +6,30 @@ resources:
 
 patchesStrategicMerge:
   - |-                                    # Patch per il Deployment dell’app Python
-    apiVersion: apps/v1                    # API Kubernetes per Deployment
-    kind: Deployment                       # Tipo di risorsa
+    apiVersion: apps/v1                    
+    kind: Deployment                       
     metadata:
-      name: python-app                     # Deployment da patchare
+      name: python-app                     
     spec:
       template:
         spec:
           containers:
-            - name: app                    # Container dell’app
+            - name: app                    
               resources:
                 limits:
-                  cpu: "0.3"               # Nuovo limite CPU per l’app
-                  memory: 300Mi            # Nuovo limite memoria per l’app
+                  cpu: "0.3"               
+                  memory: 300Mi            
   - |-                                    # Patch per il Deployment MongoDB
-    apiVersion: apps/v1                    # API Kubernetes per Deployment
-    kind: Deployment                       # Tipo di risorsa
+    apiVersion: apps/v1                    
+    kind: Deployment                       
     metadata:
-      name: mongodb                        # Deployment MongoDB da patchare
+      name: mongodb                        
     spec:
       template:
         spec:
           containers:
-            - name: mongodb                # Container MongoDB
+            - name: mongodb                
               resources:
                 limits:
-                  cpu: "0.6"               # Nuovo limite CPU per MongoDB
-                  memory: 600Mi             # Nuovo limite memoria per MongoDB
+                  cpu: "0.6"               
+                  memory: 600Mi             
