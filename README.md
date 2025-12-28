@@ -162,29 +162,23 @@ kubectl set env deployment/mongodb \
   MONGO_INITDB_ROOT_USERNAME=admin \
   MONGO_INITDB_ROOT_PASSWORD=adminpassword
 
-# 7. Attesa avvio MongoDB (30 secondi)
-sleep 30
-
-# 8. Inizializzazione database con dati di test
+# 7. Inizializzazione database con dati di test
 kubectl exec deployment/mongodb -- \
   mongosh -u admin -p adminpassword --authenticationDatabase admin \
   --eval "use dbDevOps; db.studenti.insertMany([{matricola: 'test', nome: 'Mario', cognome: 'Rossi', corso: 'Ingegneria Informatica'}, {matricola: '12345', nome: 'Luigi', cognome: 'Verdi', corso: 'Informatica'}, {matricola: '67890', nome: 'Anna', cognome: 'Bianchi', corso: 'Ingegneria del Software'}])"
 
-# 9. Creazione deployment applicazione Python
+# 8. Creazione deployment applicazione Python
 kubectl create deployment python-app --image=python-app:latest
 
-# 10. Configurazione variabili ambiente applicazione Python
+# 9. Configurazione variabili ambiente applicazione Python
 kubectl set env deployment/python-app \
   MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/dbDevOps?authSource=admin \
   DB_NAME=dbDevOps \
   COLLECTION_NAME=studenti
 
-# 11. Configurazione policy di pull dell'immagine
+# 10. Configurazione policy di pull dell'immagine
 kubectl patch deployment python-app -p \
 '{"spec":{"template":{"spec":{"containers":[{"name":"python-app","imagePullPolicy":"IfNotPresent"}]}}}}'
-
-# 12. Attesa avvio applicazione (20 secondi)
-sleep 20
 ```
 
 ---
